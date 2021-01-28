@@ -5,12 +5,41 @@ class longint {
 public:
 	bool arr[256];
 
-	bool operator == (const longint &ref) const {
+	bool operator == (const longint& ref) const {
 		return arr == ref.arr;
 	}
 
-	longint operator + (const longint& ref) const {
+	bool operator > (const longint& ref) const {
+		for (int i = 0; i < 256; i++) {
+			if (arr[i] && !ref.arr[i])
+				return true;
+			if (ref.arr[i] && !arr[i])
+				return false;
+		}
+		return false;
+	}
 
+	bool operator < (const longint& ref) const {
+		for (int i = 0; i < 256; i++) {
+			if (!arr[i] && ref.arr[i])
+				return true;
+			if (!ref.arr[i] && arr[i])
+				return false;
+		}
+		return false;
+	}
+
+	longint operator + (const longint& ref) const {
+		bool sum[257];
+
+		bool XOR = 0;
+		bool carry = 0;
+		for (int i = 255; i >= 0; i--) {
+			XOR = arr[i] ^ ref.arr[i];
+			sum[i + 1] = XOR ^ carry;
+			carry = (arr[i] & ref.arr[i]) | (XOR & carry);
+		}
+		sum[0] = carry;
 	}
 
 	longint operator - (const longint& ref) const {
@@ -21,11 +50,20 @@ public:
 
 	}
 
-	longint operator ^ (const longint& ref) const {
-
+	longint operator % (const longint& ref) const {
+		if (arr == ref.arr)
+			return longint();
+		longint b = *this;
+		while (b > ref) {
+			longint q;
+			while (q < (b / 2))
+				q = q * 2;
+			b = b - q;
+		}
+		return b;
 	}
 
-	longint operator % (const longint& ref) const {
+	longint pow(const longint& ref) {
 
 	}
 
@@ -38,7 +76,7 @@ public:
 	}
 
 	longint() {
-		for (auto i : arr)
+		for (auto &i : arr)
 			i = 1;
 	}
 };
@@ -62,25 +100,6 @@ public:
 	}
 	point() = default;
 };
-
-/*
-def point_add(P_x, P_y, Q_x, Q_y):
-	if P_x == O:
-		return Q_x, Q_y
-	if Q_x == O:
-		return P_x, P_y
-	if Q_x == P_x:
-		if Q_y == P_y:
-			Lambda = 3 * P_x**2 * pow(2 * P_y, p - 2, p)
-		elif Q_y == (-P_y) % p:
-			return O, O
-	else:
-		Lambda = (Q_y - P_y) * pow(Q_x - P_x, p - 2, p)
-	x_r = (Lambda**2 - (P_x + Q_x)) % p
-	y_r = (Lambda * (P_x - x_r) - P_y) % p
-	return x_r, y_r
-*/
-
 
 point add(point& P, point& Q, longint &p) {
 	longint lambda;
